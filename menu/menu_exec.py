@@ -2,6 +2,7 @@
 # Version 1
 from menu import Menu
 from motor.motor import Motor
+from trayecto import Trayecto
 import pdb
 import json
 ## Show menu ##
@@ -21,25 +22,39 @@ menu['11']="Salir del sistema"
 
 gm = Motor()
 menu_backend = Menu()
+
+journey_list = []
 while True:
         try:
                 for k in sorted(menu):
                         print (str(k) + ' ' + menu[k])
                 print()
                 selection = input("Elija un opción: ")
-        
+
                 if selection == '1' or selection == '01':
+
                         print (menu['01'])
                         origen = input("Ciudad Origen: ")
                         destino = input("Ciudad Destino: ")
+
                         print (40 * '-')
-                        gmaps_dict = gm.get_trayecto(origen,destino)
-                
-                        print ("Origen: %s" % menu_backend.getOrigen(gmaps_dict)[0])
-                        print ("Destino: %s" % menu_backend.getDestino(gmaps_dict)[0])
-                        print ("Distancia: %s" % menu_backend.getDistance(gmaps_dict))
-                        print ("Duracion: %s" % menu_backend.getDuration(gmaps_dict))
-                        print (40 * '-')
+                        gmaps_dict = gm.create_trayecto(origen,destino)
+                        orig = menu_backend.getOrigen(gmaps_dict)[0]
+                        dest = menu_backend.getDestino(gmaps_dict)[0]
+                        if orig == dest: print ('Origen y Destino deben ser diferentes \n' + 40 * '-')
+
+                        else:
+                            dist = menu_backend.getDistance(gmaps_dict)
+                            time = menu_backend.getDuration(gmaps_dict)
+                            journey = Trayecto(orig, dest, dist, time)
+                            journey_list.append(vars(journey))
+
+                            print ("Origen: %s" % orig)
+                            print ("Destino: %s" % dest)
+                            print ("Distancia: %s" % dist)
+                            print ("Duracion: %s" % time)
+                            print (40 * '-')
+
                 elif selection == '2' or selection == '02':
                         print ("2")
                 elif selection == '3' or selection == '03':
@@ -60,7 +75,7 @@ while True:
                 elif selection == '10':
                         print ("10")
                 elif selection == '11':
-                        #llamar al metodo guardar
+                        menu_backend.guardar(journey_list)
                         break
                 else:
                         print(40 * '-')
