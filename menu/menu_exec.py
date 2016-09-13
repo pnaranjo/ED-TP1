@@ -81,14 +81,14 @@ while True:
                         gmaps_dict = gm.create_trayecto(origen,destino)
                         while menu_backend.getDestino(gmaps_dict)[0] == journey_orig['destino']: destino = input('Los destinos son iguales... Ingrese el nuevo destino: ')
                         gmaps_dict = gm.create_trayecto(origen,destino)
-                        pdb.set_trace()
+                        #pdb.set_trace()
                         journey_name = input('Elija un nombre para su trayecto: ')
                         print (40 * '-')
                         orig = journey_orig['origen']
                         dest = []
                         dest.append(journey_orig['destino'])
                         dest.append(menu_backend.getDestino(gmaps_dict)[0])
-                        dist = str(int(journey_orig['distancia'].split(' ')[0]) + int(menu_backend.getDistance(gmaps_dict).split(' ')[0])) + ' km'
+                        dist = str(float( journey_orig['distancia'].split(' ')[0].replace(',','') ) + float(menu_backend.getDistance(gmaps_dict).split(' ')[0].replace(',',''))) + ' km'
                         time_in_sec = menu_backend.getTimeInSec(gmaps_dict) + journey_orig['time_in_sec']
                         time = time_in_sec_to_time(time_in_sec)
                         journey = Trayecto(orig, dest, dist, time, journey_name, time_in_sec)
@@ -158,7 +158,26 @@ while True:
                                 print(40 * '-')
                                 input('Presione Enter para continuar...')
                 elif selection == '6' or selection == '06':
-                        print ("6")
+                        menu_backend.listar(journey_list)
+                        print ('\n')
+                        journey_id = input('Ingrese el ID del primer trayecto que desea utilizar: ')
+                        journey = menu_backend.get_trayecto(journey_list, journey_id)
+                        #limpio origen
+                        origen_str = str(journey['origen']).replace("'",'')
+                        origen_str = origen_str.replace("[",' ')
+                        origen_str = origen_str.replace("]",' ')
+                        #limpio destino
+                        destino_str = str(journey['destino']).replace("'",'')
+                        destino_str = destino_str.replace("[",' ')
+                        destino_str = destino_str.replace("]",' ')
+
+                        pprint.pprint('Ciudades: ' + origen_str + ', ' + destino_str)
+                        pprint.pprint('Distancia ' + journey['distancia'])
+                        pprint.pprint('Tiempo ' + journey['tiempo'])
+
+                        print(40 * '-')
+                        input('Presione Enter para continuar...')
+
                 elif selection == '7' or selection == '07':
                         print ("7")
                 elif selection == '8' or selection == '08':
