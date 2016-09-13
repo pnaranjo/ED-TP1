@@ -35,3 +35,9 @@ class Menu:
         for journey in journey_list:
             pprint.pprint(journey)
             print ( 40 * "-" )
+
+    #ver como hacerlo, aparte de traer el archivo, deberia de llenar el journey_list
+    def cargar(self, archivo):
+        with open(archivo) as json_data:
+            d = json.loads(json_data)
+            pprint.pprint(d)

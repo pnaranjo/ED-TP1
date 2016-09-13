@@ -187,7 +187,8 @@ while True:
                 elif selection == '9' or selection == '09':
                         menu_backend.guardar(journey_list)
                 elif selection == '10':
-                        print ("10")
+                        menu_backend.cargar(input('nombre del archivo: '))
+                        input('Presione Enter para continuar...')
                 elif selection == '11':
                         menu_backend.guardar(journey_list)
                         break
