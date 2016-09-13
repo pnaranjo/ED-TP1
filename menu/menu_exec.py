@@ -106,7 +106,57 @@ while True:
                 elif selection == '4' or selection == '04':
                         print ("4")
                 elif selection == '5' or selection == '05':
-                        print ("5")
+                        #Comparar dos trayectos d para distancia t para tiempo
+                        tipo_comp = input('comparar por d -> distacia, t -> tiempo: ' )
+                        if tipo_comp != 'd' and tipo_comp != 't':
+                            print ('los valores validos son d o t')
+                            print(40 * '-')
+                            input('Presione Enter para continuar...')
+                        else:
+                            menu_backend.listar(journey_list)
+                            print ('\n')
+                            journey_id_p = input('Ingrese el ID del primer trayecto que desea utilizar: ')
+                            journey_id_s = input('Ingrese el ID del segundo trayecto que desea utilizar: ')
+                            if str(tipo_comp) == 'd':
+                                #decir el trayecto con mayor distacia es
+                                journey_p = menu_backend.get_trayecto(journey_list, journey_id_p)
+                                primero = journey_p['distancia']
+                                primero_number = primero.split(' ')[0]
+                                primero_number.replace(',','')
+
+                                journey_s = menu_backend.get_trayecto(journey_list, journey_id_s)
+                                segundo = journey_s['distancia']
+                                segundo_number = segundo.split(' ')[0]
+                                segundo_number = str(segundo_number.replace(',',''))
+
+                                t1 = float(primero_number)
+                                t2 = float(segundo_number)
+
+                                if t1 > t2:
+                                    print('Trayecto uno recorrio mas distancia')
+                                elif t1 < t2:
+                                    print('Trayecto dos recorrio mas distancia')
+                                else:
+                                    print('ambos recorrieron misma distancia')
+                                print(40 * '-')
+                                input('Presione Enter para continuar...')
+                            else:
+                                #decir el trayecto con mayor tiempo es
+                                journey_p = menu_backend.get_trayecto(journey_list, journey_id_p)
+                                primero = journey_p['time_in_sec']
+
+                                journey_s = menu_backend.get_trayecto(journey_list, journey_id_s)
+                                segundo = journey_s['time_in_sec']
+
+                                if primero > segundo:
+                                    print('Trayecto uno viajo mas tiempo')
+                                elif primero < segundo:
+                                    print('Trayecto dos viajo mas tiempo')
+                                else:
+                                    print('ambos viajaron misma cantidad de tiempo')
+
+                                print(40 * '-')
+                                input('Presione Enter para continuar...')
                 elif selection == '6' or selection == '06':
                         print ("6")
                 elif selection == '7' or selection == '07':
