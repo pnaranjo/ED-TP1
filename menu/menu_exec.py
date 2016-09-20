@@ -179,7 +179,34 @@ while True:
                         input('Presione Enter para continuar...')
 
                 elif selection == '7' or selection == '07':
-                        print ("7")
+                        menu_backend.listar(journey_list)
+                        print ('\n')
+                        journey_id = input('Ingrese el ID del trayecto que desea utilizar: ')
+                        journey = menu_backend.get_trayecto(journey_list, journey_id)
+
+                        # obtengo la lista de origenes y destinos
+                        destino_list = []
+                        origen_list = []
+                        for k, v in journey.items():
+                            if k == 'origen':
+                                origen_list.append(v)
+                                print('origen_list ', origen_list)
+                            if k == 'destino':
+                                destino_list.append(v)
+                                print('destino_list ', destino_list)
+                        # recorro las listas y voy armando los trayectos
+                        for x in origen_list:
+                            print(x)
+                            origen = x
+                            for y in destino_list:
+                                print(y)
+                                destino = y
+                                print(origen, ' - ', destino)
+                                gmaps_dict = gm.create_trayecto(origen,destino)
+                                print ('Tiempo', menu_backend.getDuration(gmaps_dict))
+                                print ('Distancia', menu_backend.getDistance(gmaps_dict))
+                                print(40 * '-')
+                        input('Presione Enter para continuar...')
                 elif selection == '8' or selection == '08':
                         print (40 * '-')
                         menu_backend.listar(journey_list)
