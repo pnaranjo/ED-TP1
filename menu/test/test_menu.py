@@ -8,6 +8,8 @@ ciudad1 = 'Buenos Aires'
 ciudad2 = 'Bs As'
 ciudad3 = 'Rosario'
 ciudad4 = 'Cordoba'
+ciudad_vacia = ''
+ciudad_mal = 'fdghkjlkñjl'
 
 menu_backend = Menu()
 motor = Motor()
@@ -29,4 +31,5 @@ class MenuTest(unittest.TestCase):
         haskeys = haskeys and 'id' in vars(journey)
         assert haskeys
 
-    
+    def test_trayecto_vacio(self):
+        self.assertRaises(Exception, motor.create_trayecto(ciudad_vacia,ciudad_vacia))

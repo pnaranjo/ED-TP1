@@ -3,6 +3,7 @@
 from menu import Menu
 from motor.motor import Motor
 from trayecto import Trayecto
+import googlemaps
 import pdb
 import json
 import pprint
@@ -36,75 +37,62 @@ while True:
                 selection = input("Elija un opción: ")
 
                 if selection == '1' or selection == '01':
-
-                        print (menu['01'])
-                        origen = input("Ciudad Origen: ")
-                        destino = input("Ciudad Destino: ")
-
-                        print (40 * '-')
-                        gmaps_dict = gm.create_trayecto(origen,destino)
-                        orig = menu_backend.getOrigen(gmaps_dict)[0]
-                        dest = menu_backend.getDestino(gmaps_dict)[0]
-                        while orig == dest:
-                            print('Origen y Destino deben ser diferentes \n' + 40 * '-')
-                            origen = input("Ciudad Origen: ")
-                            destino = input("Ciudad Destino: ")
-
-                        if gmaps_dict['rows'][0]['elements'][0]['status'] != 'OK':
-                            print ('No es posible calcular el trayecto entre las ciudades " %s " y " %s "' % (orig,dest))
-                            print ( 40 * '-' )
-                            input('Presione Enter para continuar...')
-                        else:
-                            journey_name = input('Elija un nombre para su trayecto: ')
-                            print (40 * '-')
-                            dist = menu_backend.getDistance(gmaps_dict)
-                            time = menu_backend.getDuration(gmaps_dict)
-                            time_in_sec = menu_backend.getTimeInSec(gmaps_dict)
-                            journey = Trayecto(orig, dest, dist, time, journey_name, time_in_sec)
-                            journey_list.append(vars(journey))
-
-                            print ("Origen: %s" % orig)
-                            print ("Destino: %s" % dest)
-                            print ("Distancia: %s" % dist)
-                            print ("Duracion: %s" % time)
-                            print (40 * '-')
-                            input('Presione Enter para continuar...')
+                     origen = input("Ciudad Origen: ")
+                     destino = input("Ciudad Destino: ")
+                     journey_name = input('Elija un nombre para su trayecto: ')
+                     journey = menu_backend.create_trayecto(origen,destino,journey_name)
+                     if journey:
+                         menu_backend.print_trayecto(journey)
+                         journey_list.append(vars(journey))
 
                 elif selection == '2' or selection == '02':
-                        print (40 * '-')
-                        menu_backend.listar(journey_list)
-                        print ('\n')
-                        journey_id = input('Ingrese el ID del trayecto que desea utilizar: ')
-                        journey_orig = menu_backend.get_trayecto(journey_list, journey_id)
-                        origen = journey_orig['destino']
-                        destino = input('Ingrese el nuevo destino: ')
-                        gmaps_dict = gm.create_trayecto(origen,destino)
-                        while menu_backend.getDestino(gmaps_dict)[0] == journey_orig['destino']: destino = input('Los destinos son iguales... Ingrese el nuevo destino: ')
-                        gmaps_dict = gm.create_trayecto(origen,destino)
-                        #pdb.set_trace()
-                        journey_name = input('Elija un nombre para su trayecto: ')
-                        print (40 * '-')
-                        orig = journey_orig['origen']
-                        dest = []
-                        dest.append(journey_orig['destino'])
-                        dest.append(menu_backend.getDestino(gmaps_dict)[0])
-                        dist = str(float( journey_orig['distancia'].split(' ')[0].replace(',','') ) + float(menu_backend.getDistance(gmaps_dict).split(' ')[0].replace(',',''))) + ' km'
-                        time_in_sec = menu_backend.getTimeInSec(gmaps_dict) + journey_orig['time_in_sec']
-                        time = time_in_sec_to_time(time_in_sec)
-                        journey = Trayecto(orig, dest, dist, time, journey_name, time_in_sec)
-                        journey_list.append(vars(journey))
-
-                        print ("Origen: %s" % orig)
-                        print ("Destino: %s" % dest)
-                        print ("Distancia: %s" % dist)
-                        print ("Duracion: %s" % time)
-                        print (40 * '-')
-                        input('Presione Enter para continuar...')
+                     menu_backend.listar(journey_list)
+                     print (40 * '-')
+                     journey_id = input('Ingrese el ID del trayecto que desea utilizar: ')
+                     trayecto = menu_backend.get_trayecto(journey_list, journey_id)
+                     if not trayecto: continue
+                     new_dest = input('Ingrese el nuevo destino: ')
+                     journey_name = input('Elija un nombre para su trayecto: ')
+                     journey = menu_backend.add_destination(trayecto, new_dest, journey_name)
+                     if journey:
+                         menu_backend.print_trayecto(journey)
+                         journey_list.append(vars(journey))
 
                 elif selection == '3' or selection == '03':
-                        print ("3")
+                     menu_backend.listar(journey_list)
+                     print (40 * '-')
+                     journey_id = input('Ingrese el ID del trayecto que desea utilizar: ')
+                     trayecto = menu_backend.get_trayecto(journey_list, journey_id)
+                     if not trayecto: continue
+                     ciudades = menu_backend.getCiudades(trayecto)
+                     menu_backend.print_ciudades(ciudades)
+                     ciudad_elec = input('Ingrese el numero de ciudad. El nuevo destino sera insertado previo a esa ciudad:  ')
+                     if ciudad_elec not in ciudades.keys():
+                         input ('Numero ingresado invalido')
+                         continue
+                     ciudad_perteneciente = ciudades[ciudad_elec]
+                     ciudad_intermedia = input('Ingrese el destino intermedio: ')
+                     journey_name = input('Elija un nombre para su trayecto: ')
+                     journey = menu_backend.add_intermediate(trayecto, ciudad_intermedia, ciudad_perteneciente, journey_name)
+                     if journey:
+                         menu_backend.print_trayecto(journey)
+                         journey_list.append(vars(journey))
+
                 elif selection == '4' or selection == '04':
-                        print ("4")
+                     menu_backend.listar(journey_list)
+                     print (40 * '-')
+                     journey_id1 = input('Ingrese el ID del primer trayecto que desea utilizar: ')
+                     trayecto1 = menu_backend.get_trayecto(journey_list, journey_id1)
+                     if not trayecto1: continue
+                     journey_id2 = input('Ingrese el ID del segundo trayecto que desea utilizar: ')
+                     trayecto2 = menu_backend.get_trayecto(journey_list, journey_id2)
+                     if not trayecto2: continue
+                     journey_name = input('Elija un nombre para su trayecto: ')
+                     journey = menu_backend.join_journey(trayecto1,trayecto2,journey_name)
+                     if journey:
+                         menu_backend.print_trayecto(journey)
+                         journey_list.append(vars(journey))
+                     
                 elif selection == '5' or selection == '05':
                         #Comparar dos trayectos d para distancia t para tiempo
                         tipo_comp = input('comparar por d -> distacia, t -> tiempo: ' )
@@ -212,10 +200,20 @@ while True:
                         menu_backend.listar(journey_list)
                         input('Presione Enter para continuar...')
                 elif selection == '9' or selection == '09':
-                        menu_backend.guardar(journey_list)
+                        file_name=input('Guardar... escriba el nombre del archivo:')
+                        file_name=file_name.replace(' ', '') + '.json'
+                        menu_backend.guardar(journey_list, file_name)
                 elif selection == '10':
-                        menu_backend.cargar(input('nombre del archivo: '))
-                        input('Presione Enter para continuar...')
+                        json_file = input('nombre del archivo: ')
+                        try:
+                            menu_backend.cargar(json_file, journey_list)
+                            print('Archivo %s cargado satisfactoriamente...' % json_file)
+                            input('Presione Enter para continuar...')
+                        except (Exception):
+                            input('Archivo no encontrado... Presione ENTER para continuar')
+                            continue
+
+
                 elif selection == '11':
                         menu_backend.guardar(journey_list)
                         break
